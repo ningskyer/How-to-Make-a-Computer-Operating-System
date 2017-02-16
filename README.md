@@ -31,4 +31,5 @@ Twitter [@SamyPesse](https://twitter.com/SamyPesse) / [GitHub](https://github.co
 ### 我们在创建什么类型的操作系统？
 
 我们的目标是用 C++ 来创建一个简单的类 UNIX 的操作系统，但它并非只是概念型的。它可以启动，运行用户态的 shell，并且可扩展
+
 ![Screen](./preview.png)
