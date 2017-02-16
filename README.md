@@ -4,14 +4,14 @@
 
 ## 内容:
 	- Chapter 1: 架构及本系统介绍  【Completed】
-	- Chapter 2: Setup the development environment
-	- Chapter 3: First boot with GRUB
-	- Chapter 4: Backbone of the OS and C++ runtime
-	- Chapter 5: Base classes for managing x86 architecture
+	- Chapter 2: 安装开发环境 【Completed】
+	- Chapter 3: 通过 GRUB 启动
+	- Chapter 4: 系统框架与 C++ 运行时
+	- Chapter 5: 管理 x86 架构的基本类
 	- Chapter 6: GDT
-	- Chapter 7: IDT and interrupts
-	- Chapter 8: Theory: physical and virtual memory
-	- Chapter 9: Memory management: physical and virtual
+	- Chapter 7: IDT 和 中断
+	- Chapter 8: 内存管理：物理内存与虚拟内存
+	- Chapter 9: 内存管理：实现
 
 关于如何用 C++ 来从零制作操作系统的电子书
 
