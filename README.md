@@ -1,3 +1,19 @@
+如何制作操作系统
+=======================================
+[SamyPesse/How-to-Make-a-Computer-Operating-System](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System) 中文翻译
+
+## TODO:
+	- Chapter 1: Introduction to the x86 architecture and about our OS
+	- Chapter 2: Setup the development environment
+	- Chapter 3: First boot with GRUB
+	- Chapter 4: Backbone of the OS and C++ runtime
+	- Chapter 5: Base classes for managing x86 architecture
+	- Chapter 6: GDT
+	- Chapter 7: IDT and interrupts
+	- Chapter 8: Theory: physical and virtual memory
+	- Chapter 9: Memory management: physical and virtual
+
+
 How to Make a Computer Operating System
 =======================================
 
