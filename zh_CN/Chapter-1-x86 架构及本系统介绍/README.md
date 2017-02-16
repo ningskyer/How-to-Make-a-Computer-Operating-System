@@ -1,35 +1,33 @@
-## Chapter 1: Introduction to the x86 architecture and about our OS
+## Chapter 1: 架构及本系统介绍
 
-### What is the x86 architecture?
+### x86 架构是什么
 
-> The term x86 denotes a family of backward compatible instruction set architectures based on the Intel 8086 CPU.
+> x86 术语指的是一系列向后兼容的指令集架构，它们是基于 Intel 8086 CPU 的。
+自从 1981 年引入 IBM PC 后， x86 架构就是最常用的指令集了。 大量的软件基于 x86 硬件来工作，包括各种操作系统，比如 DOS，Windows，Linux，BSD，Solaris 和 Mac OS X。
 
-The x86 architecture is the most common instruction set architecture since its introduction in 1981 for the IBM PC. A large amount of software, including operating systems (OS's) such as DOS, Windows, Linux, BSD, Solaris and Mac OS X, function with x86-based hardware.
+本课程将设计基于 x86-32 架构的操作系统，而不是 x86-64 架构。多亏向后兼容性，我们的操作系统能兼容新 PC（但是如果你在真机上测试的话你要小心）。
 
-In this course we are not going to design an operating system for the x86-64 architecture but for x86-32, thanks to backward compatibility, our OS will be compatible with our newer PCs (but take caution if you want to test it on your real machine).
+### 我们的操作系统
+目标是用 C++ 来创建一个简单的类 UNIX 的操作系统，但它并非只是概念型的。它可以启动，运行用户态的 shell，并且可扩展。
 
-### Our Operating System
+总之，这个操作系统为 x86 架构创建，运行在 32 位机器上，并兼容 IBM PC。
 
-The goal is to build a very simple UNIX-based operating system in C++, but the goal is not to just build a "proof-of-concept". The OS should be able to boot, start a userland shell and be extensible.
+**特别注意:**
 
-The OS will be built for the x86 architecture, running on 32 bits, and compatible with IBM PCs.
-
-**Specifications:**
-
-* Code in C++
-* x86, 32 bit architecture
-* Boot with Grub
-* Kind of modular system for drivers
-* Kind of UNIX style
-* Multitasking
-* ELF executable in userland
-* Modules (accessible in userland using /dev/...) :
-    * IDE disks
-    * DOS partitions
-    * Clock
-    * EXT2 (read only)
-    * Boch VBE
-* Userland :
-    * API Posix
+* 用 C++ 编码
+* x86, 32 架构
+* 用 Grub 启动
+* 驱动模块化
+* UNIX 风格
+* 多任务
+* 用户态可执行 ELF 文件
+* 模块（用户态通过 /dev/... 访问）
+	* IDE 硬盘
+	* DOS 分区
+	* 时钟
+	* EXT2 文件系统（只读）
+	* Boch VBE
+* 用户态 :
+    * Posix 标准的 API
     * LibC
-    * "Can" run a shell or some executables (e.g., lua)
+    * 能运行脚本或者其他可执行文件（比如 lua）

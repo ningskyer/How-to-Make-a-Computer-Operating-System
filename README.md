@@ -1,9 +1,9 @@
 如何制作操作系统
 =======================================
-[SamyPesse/How-to-Make-a-Computer-Operating-System](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System) 中文翻译
+[SamyPesse/How-to-Make-a-Computer-Operating-System](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System) 项目的中文翻译
 
-## TODO:
-	- Chapter 1: Introduction to the x86 architecture and about our OS
+## 内容:
+	- Chapter 1: 架构及本系统介绍  【Completed】
 	- Chapter 2: Setup the development environment
 	- Chapter 3: First boot with GRUB
 	- Chapter 4: Backbone of the OS and C++ runtime
@@ -13,26 +13,21 @@
 	- Chapter 8: Theory: physical and virtual memory
 	- Chapter 9: Memory management: physical and virtual
 
+关于如何用 C++ 来从零制作操作系统的电子书
 
-How to Make a Computer Operating System
-=======================================
+**注意**: 这个仓库是我以前课程成果的修改版。它是几年前我在高中时写的其中一个[项目](https://github.com/SamyPesse/devos)，我仍然在重构某些部分。原始课程是法语的，而我的母语也并非英语。我准备业余时间继续提高这门课程。
 
-Online book about how to write a computer operating system in C/C++ from scratch.
+**书籍**: 
+线上版本可以在这里获取[http://samypesse.gitbooks.io/how-to-create-an-operating-system/](http://samypesse.gitbooks.io/how-to-create-an-operating-system/) (PDF, Mobi 和 ePub 格式)，它是用[GitBook](https://www.gitbook.com/) 生成的。
 
-**Caution**: This repository is a remake of my old course. It was written several years ago [as one of my first projects when I was in High School](https://github.com/SamyPesse/devos), I'm still refactoring some parts. The original course was in French and I'm not an English native. I'm going to continue and improve this course in my free-time.
+**源码**: 所有系统源码都将存在 [src](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/tree/master/src) 目录下。每一步都会包含指向相关文件的链接。
 
-**Book**: An online version is available at [http://samypesse.gitbooks.io/how-to-create-an-operating-system/](http://samypesse.gitbooks.io/how-to-create-an-operating-system/) (PDF, Mobi and ePub). It was generated using [GitBook](https://www.gitbook.com/).
+**贡献**: 这个课程开放贡献，欢迎提 issues 或 PR。
 
-**Source Code**: All the system source code will be stored in the [src](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/tree/master/src) directory. Each step will contain links to the different related files.
+**提问**: 欢迎通过 issues 或评论来提问题。
 
-**Contributions**: This course is open to contributions, feel free to signal errors with issues or directly correct the errors with pull-requests.
+Twitter [@SamyPesse](https://twitter.com/SamyPesse) / [GitHub](https://github.com/SamyPesse).
 
-**Questions**: Feel free to ask any questions by adding issues or commenting sections.
+### 我们在创建什么类型的操作系统？
 
-You can follow me on Twitter [@SamyPesse](https://twitter.com/SamyPesse) or [GitHub](https://github.com/SamyPesse).
-
-### What kind of OS are we building?
-
-The goal is to build a very simple UNIX-based operating system in C++, not just a "proof-of-concept". The OS should be able to boot, start a userland shell, and be extensible.
-
-![Screen](./preview.png)
+我们的目标是用 C++ 来创建一个简单的类 UNIX 的操作系统，但它并非只是概念型的。它可以启动，运行用户态的 shell，并且可扩展![Screen](./preview.png)
