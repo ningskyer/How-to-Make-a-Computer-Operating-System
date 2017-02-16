@@ -5,7 +5,7 @@
 ## 内容:
 	- Chapter 1: 架构及本系统介绍  【Completed】
 	- Chapter 2: 安装开发环境 【Completed】
-	- Chapter 3: 通过 GRUB 启动
+	- Chapter 3: 通过 GRUB 启动 【Completed】
 	- Chapter 4: 系统框架与 C++ 运行时
 	- Chapter 5: 管理 x86 架构的基本类
 	- Chapter 6: GDT
