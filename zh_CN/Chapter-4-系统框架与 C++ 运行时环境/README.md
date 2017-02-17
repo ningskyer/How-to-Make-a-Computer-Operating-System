@@ -1,16 +1,16 @@
-## Chapter 4: Backbone of the OS and C++ runtime
+## Chapter 4: 系统框架与 C++ 运行时
 
-#### C++ kernel run-time
+#### 内核的 C++ 运行时
 
-A kernel can be written in C++ just as it can be in C, with the exception of a few pitfalls that come with using C++ (runtime support, constructors, etc). 
+内核可以用 C++ 写也可以用 C 写，倾向于用 C++ 是因为一些它语言机制的诱惑，比如运行时支持，构造函数等。
 
-The compiler will assume that all the necessary C++ runtime support is available by default, but as we are not linking libsupc++ into your C++ kernel, we need to add some basic functions that can be found in the [cxx.cc](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/cxx.cc) file.
+编译器默认假设 C++ 的运行时环境是完整的，但是我们没把 libsupc++ 链接到 C++ 内核中，所以需要增加一些基本函数。这些函数可以在 [cxx.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/cxx.cc) 文件中找到。
 
-**Caution:** The operators `new` and `delete` cannot be used before virtual memory and pagination have been initialized.
+**注意:** 操作符 `new` and `delete` 在虚拟内存和分页未初始化前是不能使用的。
 
-#### Basic C/C++ functions
+#### 基本的 C/C++ 函数
 
-The kernel code can't use functions from the standard libraries so we need to add some basic functions for managing memory and strings:
+内核代码不能使用标准库中的函数，所以我们需要增加一些基本函数来挂历内存和字符串。
 
 ```cpp
 void 	itoa(char *buf, unsigned long int n, int base);
@@ -26,11 +26,11 @@ char *	strncpy(char *destString, const char *sourceString,int maxLength);
 int 	strncmp( const char* s1, const char* s2, int c );
 ```
 
-These functions are defined in [string.cc](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/string.cc), [memory.cc](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/memory.cc), [itoa.cc](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/itoa.cc)
+这些函数是在 [string.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/string.cc), [memory.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/memory.cc), [itoa.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/itoa.cc) 中定义的。
 
-#### C types
+#### C 类型
 
-In the next step, we're going to define different types we're going to use in our code. Most of our variable types are going to be unsigned. This means that all the bits are used to store the integer. Signed variables use their first bit to indicate their sign. 
+下一步，我们来定义一下将在代码中用到的不同类型。大部分变量类型是 unsigned 的。这意味着它们的所有位（bit）都用来存储整型数据。signed 变量用第一位来标志类型。
 
 ```cpp
 typedef unsigned char 	u8;
@@ -44,24 +44,24 @@ typedef signed int 		s32;
 typedef signed long long	s64;
 ```
 
-#### Compile our kernel
+#### 编译内核
 
-Compiling a kernel is not the same thing as compiling a linux executable, we can't use a standard library and should have no dependencies to the system.
+编译内核跟编译一个可执行的 linux 系统是不同的，我们不能用标准库也不能依赖系统。
 
-Our [Makefile](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/Makefile) will define the process to compile and link our kernel.
+Makefile](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/Makefile) 文件定义了编译和链接内核的过程
 
-For x86 architecture, the followings arguments will be used for gcc/g++/ld:
+x86 架构中，gcc/g++/ld 将使用以下参数：
 
 ```
-# Linker
+# 链接器
 LD=ld
 LDFLAG= -melf_i386 -static  -L ./  -T ./arch/$(ARCH)/linker.ld
 
-# C++ compiler
+# C++ 编译器
 SC=g++
 FLAG= $(INCDIR) -g -O2 -w -trigraphs -fno-builtin  -fno-exceptions -fno-stack-protector -O0 -m32  -fno-rtti -nostdlib -nodefaultlibs 
 
-# Assembly compiler
+# 汇编编译器
 ASM=nasm
 ASMFLAG=-f elf -o
 ```
