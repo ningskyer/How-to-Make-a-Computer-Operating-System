@@ -3,25 +3,26 @@
 [SamyPesse/How-to-Make-a-Computer-Operating-System](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System) 项目的中文翻译
 
 ## 内容:
-	- Chapter 1: 架构及本系统介绍  【Completed】
-	- Chapter 2: 安装开发环境 【Completed】
-	- Chapter 3: 通过 GRUB 启动 【Completed】
-	- Chapter 4: 系统框架与 C++ 运行时 【Compeleted】
-	- Chapter 5: 管理 x86 架构的基本类
-	- Chapter 6: GDT
-	- Chapter 7: IDT 和 中断
-	- Chapter 8: 内存管理：物理内存与虚拟内存
-	- Chapter 9: 进程管理与多任务
-	- Chapter 10: 外部可执行程序：ELF 文件
-	- Chapter 11: 用户空间与系统调用
-	- Chapter 12: 模块化的驱动程序
-	- Chapter 13: 一些基础模块	：命令行、键盘
-	- Chapter 14: 硬盘
-	- Chapter 15: DOS 分区
-	- Chapter 16: EXT2 只读文件系统
-	- Chapter 17: C 标准库（libc）
-	- Chapter 18: UNIX 基本工具：sh, cat
-	- Chapter 19: lua 解释器
+
+- Chapter 1: 架构及本系统介绍  【Completed】
+- Chapter 2: 安装开发环境 【Completed】
+- Chapter 3: 通过 GRUB 启动 【Completed】
+- Chapter 4: 系统框架与 C++ 运行时 【Compeleted】
+- Chapter 5: 管理 x86 架构的基本类
+- Chapter 6: GDT
+- Chapter 7: IDT 和 中断
+- Chapter 8: 内存管理：物理内存与虚拟内存
+- Chapter 9: 进程管理与多任务
+- Chapter 10: 外部可执行程序：ELF 文件
+- Chapter 11: 用户空间与系统调用
+- Chapter 12: 模块化的驱动程序
+- Chapter 13: 一些基础模块	：命令行、键盘
+- Chapter 14: 硬盘
+- Chapter 15: DOS 分区
+- Chapter 16: EXT2 只读文件系统
+- Chapter 17: C 标准库（libc）
+- Chapter 18: UNIX 基本工具：sh, cat
+- Chapter 19: lua 解释器
 
 关于如何用 C++ 来从零制作操作系统的电子书
 
