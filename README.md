@@ -7,8 +7,8 @@
 - Chapter 1: 架构及本系统介绍  【Completed】
 - Chapter 2: 安装开发环境 【Completed】
 - Chapter 3: 通过 GRUB 启动 【Completed】
-- Chapter 4: 系统框架与 C++ 运行时 【Compeleted】
-- Chapter 5: 管理 x86 架构的基本类
+- Chapter 4: 系统框架与 C++ 运行时 【Completed】
+- Chapter 5: 管理 x86 架构的基本类 【Completed】
 - Chapter 6: GDT
 - Chapter 7: IDT 和 中断
 - Chapter 8: 内存管理：物理内存与虚拟内存
