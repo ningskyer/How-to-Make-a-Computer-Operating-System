@@ -9,20 +9,21 @@
 - Chapter 3: 通过 GRUB 启动 【Completed】
 - Chapter 4: 系统框架与 C++ 运行时 【Completed】
 - Chapter 5: 管理 x86 架构的基本类 【Completed】
-- Chapter 6: GDT
+- Chapter 6: 全局描述表：GDT
 - Chapter 7: IDT 和 中断
 - Chapter 8: 内存管理：物理内存与虚拟内存
-- Chapter 9: 进程管理与多任务
-- Chapter 10: 外部可执行程序：ELF 文件
-- Chapter 11: 用户空间与系统调用
-- Chapter 12: 模块化的驱动程序
-- Chapter 13: 一些基础模块	：命令行、键盘
-- Chapter 14: 硬盘
-- Chapter 15: DOS 分区
-- Chapter 16: EXT2 只读文件系统
-- Chapter 17: C 标准库（libc）
-- Chapter 18: UNIX 基本工具：sh, cat
-- Chapter 19: lua 解释器
+- Chapter 9: 内存管理：实现
+- Chapter 10: 进程管理与多任务
+- Chapter 11: 外部可执行程序：ELF 文件
+- Chapter 12: 用户空间与系统调用
+- Chapter 13: 模块化的驱动程序
+- Chapter 14: 一些基础模块	：命令行、键盘
+- Chapter 15: 硬盘
+- Chapter 16: DOS 分区
+- Chapter 17: EXT2 只读文件系统
+- Chapter 18: C 标准库（libc）
+- Chapter 19: UNIX 基本工具：sh, cat
+- Chapter 20: lua 解释器
 
 
 这是一本关于如何用 C++ 来从零制作操作系统的电子书
