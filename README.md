@@ -9,7 +9,7 @@
 - Chapter 3: 通过 GRUB 启动 【Completed】
 - Chapter 4: 系统框架与 C++ 运行时 【Completed】
 - Chapter 5: 管理 x86 架构的基本类 【Completed】
-- Chapter 6: 全局描述表：GDT
+- Chapter 6: 全局描述表：GDT【Completed】
 - Chapter 7: IDT 和 中断
 - Chapter 8: 内存管理：物理内存与虚拟内存
 - Chapter 9: 内存管理：实现
