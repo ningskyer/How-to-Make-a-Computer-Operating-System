@@ -1,39 +1,39 @@
-## Chapter 5: Base classes for managing x86 architecture
+## Chapter 5: 管理 x86 架构的基本类
 
-Now that we know how to compile our C++ kernel and boot the binary using GRUB, we can start to do some cool things in C/C++.
+现在我们知道了怎么编译 C++ 内核以及用 GRUB 来引导二进制文件，我们可以开始用 C/C++ 做些帅气的事情了。
 
-#### Printing to the screen console
+#### 向命令行窗口打印
 
-We are going to use VGA default mode (03h) to display some text to the user. The screen can be directly accessed using the video memory at 0xB8000. The screen resolution is 80x25 and each character on the screen is defined by 2 bytes: one for the character code, and one for the style flag. This means that the total size of the video memory is 4000B (80B*25B*2B).
+我们将使用 VGA 默认模式（03h）来给用户显示文字。屏幕可以从 0xB8000 处的视频内存来直接访问。这个屏幕分辨率方案是 80x25，每个字符通过 2 个字节来定义：一个是字符代码，一个是样式标志。这意味着视频内存总大小是 4000B (80B*25B*2B)。
 
-In the IO class ([io.cc](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc)),:
-* **x,y**: define the cursor position on the screen
-* **real_screen**: define the  video memory pointer
-* **putc(char c)**: print a unique character on the screen and manage cursor position
-* **printf(char* s, ...)**: print a string
+在 IO 类([io.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc))中:
+* **x,y**: 定义屏幕光标位置
+* **real_screen**: 定义视频内存的指针
+* **putc(char c)**: 在屏幕上打印一个字符并管理光标位置
+* **printf(char* s, ...)**: 打印一个字符串
 
-We add a method **putc** to the [IO Class](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc) to put a character on the screen and update the (x,y) position.
+我们给 [IO 类](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc) 增加了一个 **putc** 方法，它用来在屏幕上放置一个字符并更新（x,y）位置。
 
 ```cpp
-/* put a byte on screen */
+/* 在屏幕上打印字符 */
 void Io::putc(char c){
 	kattr = 0x07;
 	unsigned char *video;
 	video = (unsigned char *) (real_screen+ 2 * x + 160 * y);
-	// newline
+	// 换行
 	if (c == '\n') {
 		x = 0;
 		y++;
-	// back space
+	// 退格符
 	} else if (c == '\b') {
 		if (x) {
 			*(video + 1) = 0x0;
 			x--;
 		}
-	// horizontal tab
+	// 制表符
 	} else if (c == '\t') {
 		x = x + 8 - (x % 8);
-	// carriage return
+	// 回车
 	} else if (c == '\r') {
 		x = 0;
 	} else {
@@ -51,10 +51,10 @@ void Io::putc(char c){
 }
 ```
 
-We also add a useful and very known method: [printf](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc#L155)
+我们还增加了一个有用且非常熟悉的方法: [printf](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc#L155)
 
 ```cpp
-/* put a string in screen */
+/* 在屏幕上打印字符串 */
 void Io::print(const char *s, ...){
 	va_list ap;
 
@@ -153,40 +153,40 @@ void Io::print(const char *s, ...){
 }
 ```
 
-#### Assembly interface
+#### 汇编接口
 
-A large number of instructions are available in Assembly but there is not equivalent in C (like cli, sti, in and out), so we need an interface to these instructions.
+汇编语言里有非常多的指令，但是 C 语言里却并不是一一对应的（比如 cli，sti，in 和 out）,所以我们需要有个调用这些指令的接口。
 
-In C, we can include Assembly using the directive "asm()", gcc use gas to compile the assembly.
+在 C 语言里，我们能直接用 "asm()" 来导入汇编语言，gcc 用 GAS 这个汇编器来编译汇编语言。
 
-**Caution:** gas uses the AT&T syntax.
+**注意:** GAS 使用 AT&T 语法
 
 ```cpp
-/* output byte */
+/* 输出字节 */
 void Io::outb(u32 ad, u8 v){
 	asmv("outb %%al, %%dx" :: "d" (ad), "a" (v));;
 }
-/* output word */
+/* 输出字 */
 void Io::outw(u32 ad, u16 v){
 	asmv("outw %%ax, %%dx" :: "d" (ad), "a" (v));
 }
-/* output word */
+/* 输出字 */
 void Io::outl(u32 ad, u32 v){
 	asmv("outl %%eax, %%dx" : : "d" (ad), "a" (v));
 }
-/* input byte */
+/* 输入字节 */
 u8 Io::inb(u32 ad){
 	u8 _v;       \
 	asmv("inb %%dx, %%al" : "=a" (_v) : "d" (ad)); \
 	return _v;
 }
-/* input word */
+/* 输入字 */
 u16	Io::inw(u32 ad){
 	u16 _v;			\
 	asmv("inw %%dx, %%ax" : "=a" (_v) : "d" (ad));	\
 	return _v;
 }
-/* input word */
+/* 输入字 */
 u32	Io::inl(u32 ad){
 	u32 _v;			\
 	asmv("inl %%dx, %%eax" : "=a" (_v) : "d" (ad));	\
