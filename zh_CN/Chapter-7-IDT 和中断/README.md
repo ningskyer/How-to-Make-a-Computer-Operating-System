@@ -1,32 +1,32 @@
-## Chapter 7: IDT and interrupts
+## Chapter 7: IDT 和中断
 
-An interrupt is a signal to the processor emitted by hardware or software indicating an event that needs immediate attention.
+中断是发送给处理器的一种信号，它是被硬件或软件触发的，表示一个需要立即响应的事件。
 
-There are 3 types of interrupts:
+有三种类型的中断：
 
-- **Hardware interrupts:** are sent to the processor from an external device (keyboard, mouse, hard disk, ...). Hardware interrupts were introduced as a way to reduce wasting the processor's valuable time in polling loops, waiting for external events.
-- **Software interrupts:** are initiated voluntarily by the software. It's used to manage system calls.
-- **Exceptions:**  are used for errors or events occurring during program execution that are exceptional enough that they cannot be handled within the program itself (division by zero, page fault, ...)
+- **硬件中断:** 由外设（键盘、鼠标、硬盘，……）发送给处理器。处理器在轮询循环中等待外部事件时会有 CPU 时间的浪费，硬件中断是种减少这种时间浪费的方式。
+- **软件中断:** 是被软件自动初始化的。它用来管理系统调用。
+- **异常:** 用来处理程序执行时内部出现了无法处理的错误或异常时（比如除以 0 ，缺页故障，……）
 
-#### The keyboard example:
+#### 键盘例子：
 
-When the user pressed a key on the keyboard, the keyboard controller will signal an interrupt to the Interrupt Controller. If the interrupt is not masked, the controller will signal the interrupt to the processor, the processor will execute a routine to manage the interrupt (key pressed or key released), this routine could, for example, get the pressed key from the keyboard controller and print the key to the screen. Once the character processing routine is completed, the interrupted job can be resumed.
+当用户在键盘上按键时，键盘控制器会给中断控制器发送一个中断信号。如果中断没有被屏蔽，中断控制器会把中断信号发送给处理器，处理器将执行一个程序来管理这个中断（如键按下或者释放），比如说执行一个程序来从键盘控制器里获取按下的键并把对应字母打印到屏幕上。一旦字符处理程序执行完后，被中断的任务就能恢复了。
 
-#### What is the PIC?
+#### 什么是 PIC?
 
-The [PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller)is a device that is used to combine several sources of interrupt onto one or more CPU lines, while allowing priority levels to be assigned to its interrupt outputs. When the device has multiple interrupt outputs to assert, it asserts them in the order of their relative priority.
+[PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller) 是一个合并几个中断源到一个或多个 CPU 线上的设备，它给中断划分优先级层次。当设备有多个中断要激活时，它会让他们根据相对优先级来激活
 
-The best known PIC is the 8259A, each 8259A can handle 8 devices but most computers have two controllers: one master and one slave, this allows the computer to manage interrupts from 14 devices.
+最出名的 PIC 是 8259A，每个 8259A 都能处理 8 个设备，但是多数计算机有两个控制器：一个主控制器一个从控制器，这使得计算机能管理 14 个设备上的中断事件。
 
-In this chapter, we will need to program this controller to initialize and mask interrupts.
+这一章里，我们需要编写控制器初始化和屏蔽中断的代码。
 
-#### What is the IDT?
+#### 什么是 IDT?
 
-> The Interrupt Descriptor Table (IDT) is a data structure used by the x86 architecture to implement an interrupt vector table. The IDT is used by the processor to determine the correct response to interrupts and exceptions.
+> 中断描述表（Interrupt Descriptor Table - IDT）是一种 x86 架构中使用的数据结构，它用来实现中断向量表。处理器用 IDT 来决定中断和异常的正确响应。
 
-Our kernel is going to use the IDT to define the different functions to be executed when an interrupt occurred.
+我们的内核打算用 IDT 来定义中断发生时要执行的不同函数。
 
-Like the GDT, the IDT is loaded using the LIDTL assembly instruction. It expects the location of a IDT description structure:
+像 GDT 一样，IDT 是用 LIDTL 汇编指令来加载的。它会给出 IDT 描述结构的地址：
 
 ```cpp
 struct idtr {
@@ -35,7 +35,7 @@ struct idtr {
 } __attribute__ ((packed));
 ```
 
-The IDT table is composed of IDT segments with the following structure:
+中断描述表是由 IDT 段组成的，段结构如下：
 
 ```cpp
 struct idtdesc {
@@ -46,12 +46,12 @@ struct idtdesc {
 } __attribute__ ((packed));
 ```
 
-**Caution:** the directive ```__attribute__ ((packed))``` signal to gcc that the structure should use as little memory as possible. Without this directive, gcc includes some bytes to optimize the memory alignment and the access during execution.
+**注意:** 指令 ```__attribute__ ((packed))``` 是告诉 gcc 编译器这个结构应该尽可能地减少占用内存。如果不写这个指令，gcc 会包含一些优化内存对齐和访问的字节。
 
-Now we need to define our IDT table and then load it using LIDTL. The IDT table can be stored wherever we want in memory, its address should just be signaled to the process using the IDTR registry.
 
-Here is a table of common interrupts (Maskable hardware interrupt are called IRQ):
+现在我们需要定义 IDT 表，然后用 LIDTL 指令加载它。IDT 表可以存储到内存的任意地址，只要它的地址能被发送给使用 IDTR 寄存器的进程就可以。
 
+下面是一张常用中断的表格（可屏蔽中断叫做 IRQ）:
 
 | IRQ   |         Description        |
 |:-----:| -------------------------- |
