@@ -14,7 +14,7 @@
 
 #### 什么是 PIC?
 
-[PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller) 是一个合并几个中断源到一个或多个 CPU 线上的设备，它给中断划分优先级层次。当设备有多个中断要激活时，它会让他们根据相对优先级来激活
+[PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller 可编程中断控制器) 是一个合并几个中断源到一个或多个 CPU 线上的设备，它给中断划分优先级层次。当设备有多个中断要激活时，它会让他们根据相对优先级来激活
 
 最出名的 PIC 是 8259A，每个 8259A 都能处理 8 个设备，但是多数计算机有两个控制器：一个主控制器一个从控制器，这使得计算机能管理 14 个设备上的中断事件。
 
@@ -55,26 +55,26 @@ struct idtdesc {
 
 | IRQ   |         Description        |
 |:-----:| -------------------------- |
-| 0 | Programmable Interrupt Timer Interrupt |
-| 1 | Keyboard Interrupt |
-| 2 | Cascade (used internally by the two PICs. never raised) |
-| 3 | COM2 (if enabled) |
-| 4 | COM1 (if enabled) |
-| 5 | LPT2 (if enabled) |
-| 6 | Floppy Disk |
-| 7 | LPT1 |
-| 8 | CMOS real-time clock (if enabled) |
-| 9 | Free for peripherals / legacy SCSI / NIC |
-| 10 | Free for peripherals / SCSI / NIC |
-| 11 | Free for peripherals / SCSI / NIC |
-| 12 | PS2 Mouse |
-| 13 | FPU / Coprocessor / Inter-processor |
-| 14 | Primary ATA Hard Disk |
-| 15 | Secondary ATA Hard Disk |
+| 0 | 可编程定时器中断 |
+| 1 | 键盘中断 |
+| 2 | Cascade (在 主从两个 PIC 内部使用，不抛出) |
+| 3 | COM2 中断(如果使能了) |
+| 4 | COM1 中断(如果使能了) |
+| 5 | LPT2 中断(if enabled) |
+| 6 | 软盘 |
+| 7 | LPT1 中断|
+| 8 | CMOS 实时时钟 (如果使能了) |
+| 9 | 外设 / 传统 SCSI / NIC 中断 |
+| 10 | 外设 / 传统 SCSI / NIC 中断 |
+| 11 | 外设 / 传统 SCSI / NIC 中断 |
+| 12 | PS2 鼠标 |
+| 13 | FPU / 协处理器 / 内部中断 |
+| 14 | 原 ATA 硬盘 |
+| 15 | 副 ATA 硬盘 |
 
-#### How to initialize the interrupts?
+#### 怎么初始化中断？
 
-This is a simple method to define an IDT segment
+这是一个定义 IDT 段的简单方法
 
 ```cpp
 void init_idt_desc(u16 select, u32 offset, u16 type, struct idtdesc *desc)
@@ -87,7 +87,7 @@ void init_idt_desc(u16 select, u32 offset, u16 type, struct idtdesc *desc)
 }
 ```
 
-And we can now initialize the interupts:
+现在我们可以初始化中断了：
 
 ```cpp
 #define IDTBASE	0x00000000
@@ -99,12 +99,12 @@ idtr kidtr;
 ```cpp
 void init_idt(void)
 {
-	/* Init irq */
+	/* 初始化可屏蔽中断 */
 	int i;
 	for (i = 0; i < IDTSIZE; i++)
 		init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]); //
 
-	/* Vectors  0 -> 31 are for exceptions */
+	/* 向量  0 -> 31 代表异常 */
 	init_idt_desc(0x08, (u32) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
 	init_idt_desc(0x08, (u32) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
 
@@ -118,52 +118,52 @@ void init_idt(void)
 	kidtr.base = IDTBASE;
 
 
-	/* Copy the IDT to the memory */
+	/* 把 IDT 拷贝到内存中 */
 	memcpy((char *) kidtr.base, (char *) kidt, kidtr.limite);
 
-	/* Load the IDTR registry */
+	/* 加载 IDTR 寄存器 */
 	asm("lidtl (kidtr)");
 }
 ```
 
-After intialization of our IDT, we need to activate interrupts by configuring the PIC. The following function will configure the two PICs by writting in their internal registries using the output ports of the processor ```io.outb```. We configure the PICs using the ports:
+IDT 初始化后，我们需要通过配置 PIC 激活中断。下面的函数将用处理器的输出端口 ```io.outb``` 来写入内部寄存器，从而实现配置主从两个 PIC。我们用端口来配置 PIC：
 
-* Master PIC: 0x20 and 0x21
-* Slave PIC: 0xA0 and 0xA1
+* 主 PIC: 0x20 和 0x21
+* 从 PIC: 0xA0 和 0xA1
 
-For a PIC, there are 2 types of registries:
+对于 PIC 来说，有两种寄存器：
 
-* ICW (Initialization Command Word): reinit the controller
-* OCW (Operation Control Word): configure the controller once initialized (used to mask/unmask the interrupts)
+* ICW (初始化命令字 Initialization Command Word): 重新初始化控制器
+* OCW (操作控制字 Operation Control Word): 配置初始化了的控制器（一般用来屏蔽和取消屏蔽中断）
 
 ```cpp
 void init_pic(void)
 {
-	/* Initialization of ICW1 */
+	/* ICW1 初始化*/
 	io.outb(0x20, 0x11);
 	io.outb(0xA0, 0x11);
 
-	/* Initialization of ICW2 */
+	/* ICW2 初始化*/
 	io.outb(0x21, 0x20);	/* start vector = 32 */
 	io.outb(0xA1, 0x70);	/* start vector = 96 */
 
-	/* Initialization of ICW3 */
+	/* ICW3 初始化*/
 	io.outb(0x21, 0x04);
 	io.outb(0xA1, 0x02);
 
-	/* Initialization of ICW4 */
+	/* ICW4 初始化*/
 	io.outb(0x21, 0x01);
 	io.outb(0xA1, 0x01);
 
-	/* mask interrupts */
+	/* 屏蔽中断 */
 	io.outb(0x21, 0x0);
 	io.outb(0xA1, 0x0);
 }
 ```
 
-#### PIC ICW configurations details
+#### PIC ICW 配置细节
 
-The registries have to be configured in order.
+寄存器必须按顺序配置。
 
 **ICW1 (port 0x20 / port 0xA0)**
 ```
@@ -180,16 +180,16 @@ The registries have to be configured in order.
  +----------------- base address for interrupts vectors
 ```
 
-**ICW2 (port 0x21 / port 0xA1)**
+**ICW2 (0x21 端口或 0xA1 端口)**
 
-For the master:
+对于主控制器:
 ```
 |x|x|x|x|x|x|x|x|
  | | | | | | | |
  +------------------ slave controller connected to the port yes (1), or no (0)
 ```
 
-For the slave:
+对于从控制器:
 ```
 |0|0|0|0|0|x|x|x|  pour l'esclave
            | | |
@@ -198,7 +198,7 @@ For the slave:
 
 **ICW4 (port 0x21 / port 0xA1)**
 
-It is used to define in which mode the controller should work.
+它是用来定义控制器应该工作在哪种模式下。
 
 ```
 |0|0|0|x|x|x|x|1|
@@ -208,9 +208,9 @@ It is used to define in which mode the controller should work.
        +------------ mode "fully nested" (1)
 ```
 
-#### Why do idt segments offset our ASM functions?
+#### 为什么 IDT 段要增加偏移量？
 
-You should have noticed that when I'm initializing our IDT segments, I'm using offsets to segment the code in Assembly. The different functions are defined in [x86int.asm](https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/x86int.asm) and are of the following scheme:
+你应该已经注意到，当我初始化 IDT 段时，使用了偏移量来给汇编语言的代码分段。是因为[x86int.asm](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/x86int.asm) 文件里定义了不同的函数，都是类似下面的方式：
 
 ```asm
 %macro	SAVE_REGS 0
@@ -247,4 +247,4 @@ _asm_int_%1:
 %endmacro
 ```
 
-These macros will be used to define the interrupt segment that will prevent corruption of the different registries, it will be very useful for multitasking.
+这些宏将会用来定义中断的段，这能防止不同寄存器的损坏，对于多任务来说是非常有用的。
