@@ -1,5 +1,8 @@
 ## Chapter 7: IDT 和中断
 
+**注：**
+IDT 与 PIC 也是在 [kernel/arch/x86/x86.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/x86.cc) 中定义的。
+
 中断是发送给处理器的一种信号，它是被硬件或软件触发的，表示一个需要立即响应的事件。
 
 有三种类型的中断：
