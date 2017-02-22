@@ -44,7 +44,7 @@ BIOS 通过依次把每个设备的引导区的前 512 个字节加载到物理�
 
 GRUB 使用 Multiboot 规范，可执行二进制文件是 32 位的，在前 8192 字节中包含了一个特殊头部（multiboot 头部）。我们的内核就会成为一个 ELF 可执行文件（("Executable and Linkable Format"，是多数 UNIX 系统中可执行文件的通用标准文件格式）。
 
-内核的第一个引导过程是用汇编语言编写的：[start.asm](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/start.asm)，我们用一个链接文件来定义我们的可执行文件结构：[linker.ld](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/linker.ld)
+内核的第一个引导过程是用汇编语言编写的：[kernel/arch/x86/start.asm](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/start.asm)，我们用一个链接文件来定义我们的可执行文件结构：[kernel/arch/x86/linker.ld](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/linker.ld)
 
 这个引导过程也初始化了一部分 C++ 运行时，下一章再讲。
 
@@ -85,7 +85,7 @@ struct multiboot_info {
 
 #### 给内核和 GRUB 创建硬盘镜像
 
-这个脚本 [diskimage.sh](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/sdk/diskimage.sh) 将会生成一个能被 QEMU 用的硬盘镜像。
+这个脚本 [sdk/diskimage.sh](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/sdk/diskimage.sh) 将会生成一个能被 QEMU 用的硬盘镜像。
 
 第一步就是用 qemu-img 来创建硬盘镜像（c.img）:
 
