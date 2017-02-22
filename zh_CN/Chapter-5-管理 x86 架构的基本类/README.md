@@ -6,7 +6,7 @@
 
 我们将使用 VGA 默认模式（03h）来给用户显示文字。屏幕可以从 0xB8000 处的显存来直接访问。这个屏幕分辨率方案是 80x25，每个字符通过 2 个字节来定义：一个是字符代码，一个是样式标志。这意味着显存总大小是 4000B (80B*25B*2B)。
 
-在 IO 类([io.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc))中:
+在 IO 类([kernel/arch/x86/io.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/io.cc))中:
 * **x,y**: 定义屏幕光标位置
 * **real_screen**: 定义显存的指针
 * **putc(char c)**: 在屏幕上打印一个字符并管理光标位置
