@@ -73,7 +73,7 @@ struct gdtdesc {
 #define GDTBASE	0x00000800
 ```
 
-[x86.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/x86.cc) 中的方法 **init_gdt_desc** 初始化了一个 GDT 段。
+[kernel/arch/x86/x86.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/arch/x86/x86.cc) 中的方法 **init_gdt_desc** 初始化了一个 GDT 段。
 
 ```cpp
 void init_gdt_desc(u32 base, u32 limite, u8 acces, u8 other, struct gdtdesc *desc)
