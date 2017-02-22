@@ -4,7 +4,7 @@
 
 内核可以用 C++ 写也可以用 C 写，倾向于用 C++ 是因为一些它语言机制的诱惑，比如运行时支持，构造函数等。
 
-编译器默认假设 C++ 的运行时环境是完整的，但是我们没把 libsupc++ 链接到 C++ 内核中，所以需要增加一些基本函数。这些函数可以在 [cxx.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/cxx.cc) 文件中找到。
+编译器默认假设 C++ 的运行时环境是完整的，但是我们没把 libsupc++ 链接到 C++ 内核中，所以需要增加一些基本函数。这些函数可以在 [kernel/runtime/cxx.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/cxx.cc) 文件中找到。
 
 **注意:** 操作符 `new` and `delete` 在虚拟内存和分页未初始化前是不能使用的。
 
@@ -26,7 +26,7 @@ char *	strncpy(char *destString, const char *sourceString,int maxLength);
 int 	strncmp( const char* s1, const char* s2, int c );
 ```
 
-这些函数是在 [string.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/string.cc), [memory.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/memory.cc), [itoa.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/itoa.cc) 中定义的。
+这些函数是在 [kernel/runtime/string.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/string.cc), [kernel/runtime/memory.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/memory.cc), [kernel/runtime/itoa.cc](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/runtime/itoa.cc) 中定义的。
 
 #### C 类型
 
@@ -48,7 +48,7 @@ typedef signed long long	s64;
 
 编译内核跟编译一个可执行的 linux 系统是不同的，我们不能用标准库也不能依赖系统。
 
-Makefile](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/Makefile) 文件定义了编译和链接内核的过程
+[kernel/Makefile](https://github.com/ningskyer/How-to-Make-a-Computer-Operating-System/blob/master/src/kernel/Makefile) 文件定义了编译和链接内核的过程
 
 x86 架构中，gcc/g++/ld 将使用以下参数：
 
