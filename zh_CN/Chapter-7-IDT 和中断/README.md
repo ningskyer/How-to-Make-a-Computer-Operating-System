@@ -9,7 +9,7 @@ IDT 与 PIC 也是在 [kernel/arch/x86/x86.cc](https://github.com/ningskyer/How-
 
 - **硬件中断:** 由外设（键盘、鼠标、硬盘，……）发送给处理器。处理器在轮询循环中等待外部事件时会有 CPU 时间的浪费，硬件中断是种减少这种时间浪费的方式。
 - **软件中断:** 是被软件自动初始化的。它用来管理系统调用。
-- **异常:** 用来处理程序执行时内部出现了无法处理的错误或异常时（比如除以 0 ，缺页故障，……）
+- **异常中断:** 用来处理程序执行时内部出现了无法处理的错误或异常时（比如除以 0 ，缺页故障，……）
 
 #### 键盘例子：
 
@@ -17,11 +17,11 @@ IDT 与 PIC 也是在 [kernel/arch/x86/x86.cc](https://github.com/ningskyer/How-
 
 #### 什么是 PIC?
 
-[PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller 可编程中断控制器) 是一个合并几个中断源到一个或多个 CPU 线上的设备，它给中断划分优先级层次。当设备有多个中断要激活时，它会让他们根据相对优先级来激活
+[PIC](http://en.wikipedia.org/wiki/Programmable_Interrupt_Controller) (Programmable interrupt controller 可编程中断控制器) 是一个合并几个中断源到一个或多个 CPU 线上的设备（译者注：一种硬件芯片），它给中断划分优先级层次。当设备有多个中断要激活时，它会让他们根据相对优先级来激活
 
-最出名的 PIC 是 8259A，每个 8259A 都能处理 8 个设备，但是多数计算机有两个控制器：一个主控制器一个从控制器，这使得计算机能管理 14 个设备上的中断事件。
+最出名的 PIC 是 8259A 中断控制芯片，每个 8259A 都能处理 8 个设备，但是多数计算机有两个控制器：一个主控制器一个从控制器，这使得计算机能管理 64 个设备上的中断事件。
 
-这一章里，我们需要编写控制器初始化和屏蔽中断的代码。
+这一章里，我们需要编写中断控制器初始化和屏蔽中断的代码。
 
 #### 什么是 IDT?
 
@@ -56,14 +56,14 @@ struct idtdesc {
 
 下面是一张常用中断的表格（可屏蔽中断叫做 IRQ）:
 
-| IRQ   |         Description        |
+| IRQ   |         描述        |
 |:-----:| -------------------------- |
 | 0 | 可编程定时器中断 |
 | 1 | 键盘中断 |
-| 2 | Cascade (在 主从两个 PIC 内部使用，不抛出) |
+| 2 | PIC 级联中断 (在主从两个 PIC 内部使用，不抛出) |
 | 3 | COM2 中断(如果使能了) |
 | 4 | COM1 中断(如果使能了) |
-| 5 | LPT2 中断(if enabled) |
+| 5 | LPT2 中断(如果使能了) |
 | 6 | 软盘 |
 | 7 | LPT1 中断|
 | 8 | CMOS 实时时钟 (如果使能了) |
@@ -77,7 +77,7 @@ struct idtdesc {
 
 #### 怎么初始化中断？
 
-这是一个定义 IDT 段的简单方法
+这是一个定义（初始化） IDT 段的简单方法
 
 ```cpp
 void init_idt_desc(u16 select, u32 offset, u16 type, struct idtdesc *desc)
@@ -102,12 +102,12 @@ idtr kidtr;
 ```cpp
 void init_idt(void)
 {
-	/* 初始化可屏蔽中断 */
+	/* 初始化可屏蔽硬件中断段 */
 	int i;
 	for (i = 0; i < IDTSIZE; i++)
 		init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]); //
 
-	/* 向量  0 -> 31 代表异常 */
+	/* 中断向量区间  0 到 31 都是异常中断 */
 	init_idt_desc(0x08, (u32) _asm_exc_GP, INTGATE, &kidt[13]);		/* #GP */
 	init_idt_desc(0x08, (u32) _asm_exc_PF, INTGATE, &kidt[14]);     /* #PF */
 
@@ -129,12 +129,12 @@ void init_idt(void)
 }
 ```
 
-IDT 初始化后，我们需要通过配置 PIC 激活中断。下面的函数将用处理器的输出端口 ```io.outb``` 来写入内部寄存器，从而实现配置主从两个 PIC。我们用端口来配置 PIC：
+IDT 初始化后，我们需要通过配置 PIC 来激活中断。下面的函数将用处理器的输出端口(译者注：引脚) ```io.outb``` 来写入 PIC 的内部寄存器，从而实现配置 PIC 主片和从片。我们用端口来配置 PIC：
 
 * 主 PIC: 0x20 和 0x21
 * 从 PIC: 0xA0 和 0xA1
 
-对于 PIC 来说，有两种寄存器：
+PIC 中有两种寄存器：
 
 * ICW (初始化命令字 Initialization Command Word): 重新初始化控制器
 * OCW (操作控制字 Operation Control Word): 配置初始化了的控制器（一般用来屏蔽和取消屏蔽中断）
@@ -168,19 +168,19 @@ void init_pic(void)
 
 寄存器必须按顺序配置。
 
-**ICW1 (port 0x20 / port 0xA0)**
+**ICW1 (端口 0x20 / 端口 0xA0)**
 ```
 |0|0|0|1|x|0|x|x|
-         |   | +--- with ICW4 (1) or without (0)
-         |   +----- one controller (1), or cascade (0)
-         +--------- triggering by level (level) (1) or by edge (edge) (0)
+         |   | +--- 有 ICW4 (1)，没有ICW4 (0)
+         |   +----- 单控制器 (1)，级联 (0)
+         +--------- 状态触发中断（1），边界触发中断（0
 ```
 
-**ICW2 (port 0x21 / port 0xA1)**
+**ICW2 (端口 0x21 / 端口 0xA1)**
 ```
 |x|x|x|x|x|0|0|0|
  | | | | |
- +----------------- base address for interrupts vectors
+ +----------------- 中断向量的基地址
 ```
 
 **ICW2 (0x21 端口或 0xA1 端口)**
@@ -189,26 +189,26 @@ void init_pic(void)
 ```
 |x|x|x|x|x|x|x|x|
  | | | | | | | |
- +------------------ slave controller connected to the port yes (1), or no (0)
+ +------------------ 从片控制器选通（1）或未选通（0）
 ```
 
-对于从控制器:
+对于从片控制器:
 ```
 |0|0|0|0|0|x|x|x|  pour l'esclave
            | | |
-           +-------- Slave ID which is equal to the master port
+           +-------- 跟主片端口相同的从片 ID
 ```
 
 **ICW4 (port 0x21 / port 0xA1)**
 
-它是用来定义控制器应该工作在哪种模式下。
+它是用来定义控制器应该工作在哪种模式下的。
 
 ```
 |0|0|0|x|x|x|x|1|
-       | | | +------ mode "automatic end of interrupt" AEOI (1)
-       | | +-------- mode buffered slave (0) or master (1)
-       | +---------- mode buffered (1)
-       +------------ mode "fully nested" (1)
+       | | | +------ 中断自动结束模式 AEOI (1)
+       | | +-------- 缓冲模式次片 (0) 缓冲模式主片 (1)
+       | +---------- 缓冲模式 (1)
+       +------------ 全嵌套模式 (1)【译者注：又称固定优先级模式，高级可嵌套入低级中断中】
 ```
 
 #### 为什么 IDT 段要增加偏移量？
@@ -250,4 +250,4 @@ _asm_int_%1:
 %endmacro
 ```
 
-这些宏将会用来定义中断的段，这能防止不同寄存器的损坏，对于多任务来说是非常有用的。
+这些宏被用来定义中断段，中断段能预防不同寄存器的冲突，这对于多任务来说是非常有用的。
