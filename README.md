@@ -10,7 +10,7 @@
 - Chapter 4: 系统框架与 C++ 运行时 【Completed】
 - Chapter 5: 管理 x86 架构的基本类 【Completed】
 - Chapter 6: 全局描述表：GDT【Completed】
-- Chapter 7: IDT 和 中断
+- Chapter 7: IDT 和 中断【Completed】
 - Chapter 8: 内存管理：物理内存与虚拟内存
 - Chapter 9: 内存管理：实现
 - Chapter 10: 进程管理与多任务
