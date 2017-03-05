@@ -1,58 +1,62 @@
-## Chapter 8: Theory: physical and virtual memory
+## Chapter 8: 内存管理：物理内存与虚拟内存理论
 
-In the chapter related to the GDT, we saw that using segmentation a physical memory address is calculated using a segment selector and an offset.
+在跟 GDT 相关的第六章，我们看到通过内存分段技术，使用段选择器和偏移量来计算出物理内存地址。
 
-In this chapter, we are going to implement paging, paging will translate a linear address from segmentation into a physical address.
+在这一章中，我们会实现分页技术，它能将线性段地址转换成物理地址。
 
-#### Why do we need paging?
+#### 我们为什么需要分页技术？
 
-Paging will allow our kernel to:
+分页技术能给内核带来：
 
-* use the hard-drive as a memory and not be limited by the machine ram memory limit
-* to have a unique memory space for each process
-* to allow and unallow memory space in a dynamic way
+* 将硬盘驱动器用作内存，而不是受限于机器的 RAW 内存限制。
+* 使每个进程拥有一个独立的内存空间
+* 动态允许和禁止内存空间的使用
 
-In a paged system, each process may execute in its own 4gb area of memory, without any chance of effecting any other process's memory, or the kernel's. It simplifies multitasking.
+在使用分页技术的系统中，每个进程在它独有的 4gb 内存区域中运行，绝不会影响其他进程或内核的内存。分页技术简化了多任务管理的复杂度。
 
-![Processes memories](./processes.png)
+```译者注```:
+如果仅适用分段地址转换，那么存储在物理内存中的一个数据结构将包含其所有部分。但如果使用了分页，那么一个数据结构就可以一部分存储在物理内存中，而另一部分保存在磁盘中。这也就是分页机制在现代内存管理中存在的重要性。
 
-#### How does it work?
+![进程内存](./processes.png)
 
-The translation of a linear address to a physical address is done in multiple steps:
+#### 分页是怎么工作的？
 
-1. The processor use the registry `CR3` to know the physical address of the pages directory.
-2. The first 10 bits of the linear address represent an offset (between 0 and 1023), pointing to an entry in the pages directory. This entry contains the physical address of a pages table.
-3. the next 10 bits of the linear address represent an offset, pointing to an entry in the pages table. This entry is pointing to a 4ko page.
-4. The last 12 bits of the linear address represent an offset (between 0 and 4095), which indicates the position in the 4ko page.
+将线性地址转换成物理地址是通过多个步骤完成的：
 
-![Address translation](./paging_memory.png)
+1. 处理器通过 `CR3` 寄存器获取到页目录表的物理地址（入口）。
+2. 线性地址的前 10 比特（0 到 1023）存储着页目录表中一个表项的地址。这个页目录表项包含了一个页表的物理地址。
+3. 接下来的 10 比特存储着页表中一个表项的地址，这个页表就是步骤二中取到的页表。这个地址指向一个 4k bit 大小（2^12=4^10=4096）的页。
+4. 最后 12 比特则代表了页中的地址位置，此页就是在步骤三中取到的页。页中存储的是
 
-#### Format for pages table and directory
+![地址转换](./paging_memory.png)
+![译者注：地址转换2](./address_transition.png)
 
-The two types of entries (table and directory) look like the same. Only the field in gray will be used in our OS.
+#### 页表和页目录的格式
 
-![Page directory entry](./page_directory_entry.png)
+这两种类型的入口（页表和页目录）看起来是一样的。只有灰色字段在操作系统中用到了。
 
-![Page table entry](./page_table_entry.png)
+![页目录入口](./page_directory_entry.png)
 
-* `P`: indicate if the page or table is in physical memory
-* `R/W`: indicate if the page or table is accessible in writting (equals 1)
-* `U/S`: equals 1 to allow access to non-preferred tasks
-* `A`: indicate if the page or table was accessed
-* `D`: (only for pages table) indicate if the page was written
-* `PS` (only for pages directory) indicate the size of pages:
+![页表入口](./page_table_entry.png)
+
+* `P`: 指示页或者表已经加载到物理内存中
+* `R/W`: 指示页或者表是否可写（1 为可写）
+* `U/S`: 为 1 时表示允许非优先任务的访问
+* `A`: 指示页或者表是否已经访问过
+* `D`: （只对表有效）指示页是否已经写入过
+* `PS`: （只对页目录有效）指示页的大小——
     * 0 = 4kb
     * 1 = 4mb
 
-**Note:** Physical addresses in the pages diretcory or pages table are written using 20 bits because these addresses are aligned on 4kb, so the last 12bits should be equal to 0.
+**Note:** 页目录或者页表里的物理地址使用 20 比特表示的，因为这些地址被分配了 4kb，所以后 12 比特应该是 0。
 
-* A pages directory or pages table used 1024*4 = 4096 bytes = 4k
-* A pages table can address 1024 * 4k = 4 Mb
-* A pages directory can address 1024 * (1024 * 4k) = 4 Gb
+* 一个页目录表或者页表使用 1024*4 = 4096 bytes = 4k 存储空间
+* 一个页表能处理 1024 * 4k = 4 Mb 空间
+* 一个页目录表能处理 1024 * (1024 * 4k) = 4 Gb 空间
 
-#### How to enable pagination?
+#### 如何使能分页？
 
-To enable pagination, we just need to set bit 31 of the `CR0`registry to 1:
+要使能分页，我们需要将 `CR0` 寄存器的第 31 比特设置为 1：
 
 ```asm
 asm("  mov %%cr0, %%eax; \
@@ -61,15 +65,15 @@ asm("  mov %%cr0, %%eax; \
        :: "i"(0x80000000));
 ```
 
-But before, we need to initialize our pages directory with at least one pages table.
+但是之前，我们需要用至少一个页表来初始化页目录表。
 
-#### Identity Mapping
+#### 一致映射
 
-With the identity mapping model, the page will apply only to the kernel as the first 4 MB of virtual memory coincide with the first 4 MB of physical memory:
+通过一致映射模型，当虚拟内存的前 4 MB 空间与物理内存的前 4 MB 空间一致的时候，页就会应用到内核中。
 
-![Identity Mapping](identitymapping.png)
+![一致映射](identitymapping.png)
 
-This model is simple: the first virtual memory page coincide to the first page in physical memory, the second page coincide to the second page on physical memory and so on ...
+模型很简单：虚拟内存的第一页跟物理内存的第一页对应，虚拟内存第二页跟物理内存第二页对应，以此类推...
 
 
 
